@@ -1,0 +1,169 @@
+{
+  "version": 1,
+  "baseBranch": "main",
+  "sourceBranch": "feat/full-rest-api",
+  "slices": [
+    {
+      "order": 1,
+      "title": "Add shared middleware and validation",
+      "rationale": "Foundation middleware for error handling and request validation needed by all routes",
+      "branch": "stack/01-middleware",
+      "confidence": 0.95
+    },
+    {
+      "order": 2,
+      "title": "Add User types, service, and tests",
+      "rationale": "Complete user business logic layer with type definitions and comprehensive tests",
+      "branch": "stack/02-user-service",
+      "confidence": 0.95
+    },
+    {
+      "order": 3,
+      "title": "Add User routes and app integration",
+      "rationale": "User API endpoints with integration into Express app and route tests",
+      "branch": "stack/03-user-routes",
+      "confidence": 0.9
+    },
+    {
+      "order": 4,
+      "title": "Add Post types, service, and tests",
+      "rationale": "Complete post business logic layer with type definitions and comprehensive tests",
+      "branch": "stack/04-post-service",
+      "confidence": 0.95
+    },
+    {
+      "order": 5,
+      "title": "Add Post routes and complete app integration",
+      "rationale": "Post API endpoints with final app integration and route tests",
+      "branch": "stack/05-post-routes",
+      "confidence": 0.9
+    }
+  ],
+  "fileAssignments": [
+    {
+      "path": "src/middleware/error-handler.ts",
+      "splitStrategy": "whole",
+      "targetSlice": 1
+    },
+    {
+      "path": "src/middleware/validate.ts",
+      "splitStrategy": "whole",
+      "targetSlice": 1
+    },
+    {
+      "path": "tests/middleware.test.ts",
+      "splitStrategy": "whole",
+      "targetSlice": 1
+    },
+    {
+      "path": "src/types/user.ts",
+      "splitStrategy": "whole",
+      "targetSlice": 2
+    },
+    {
+      "path": "src/services/user-service.ts",
+      "splitStrategy": "whole",
+      "targetSlice": 2
+    },
+    {
+      "path": "tests/user-service.test.ts",
+      "splitStrategy": "whole",
+      "targetSlice": 2
+    },
+    {
+      "path": "src/routes/users.ts",
+      "splitStrategy": "whole",
+      "targetSlice": 3
+    },
+    {
+      "path": "tests/user-routes.test.ts",
+      "splitStrategy": "whole",
+      "targetSlice": 3
+    },
+    {
+      "path": "src/app.ts",
+      "splitStrategy": "dissect",
+      "sliceContents": [
+        {
+          "slice": 3,
+          "content": "import express from \"express\";\nimport { userRouter } from \"./routes/users.js\";\nimport { notFoundHandler, errorHandler } from \"./middleware/error-handler.js\";\n\nconst app = express();\n\napp.use(express.json());\n\napp.get(\"/health\", (_req, res) => {\n  res.json({ status: \"ok\" });\n});\n\napp.use(\"/users\", userRouter);\n\napp.use(notFoundHandler);\napp.use(errorHandler);\n\nexport default app;\n",
+          "description": "Add express.json(), user router integration, and error handling middleware"
+        },
+        {
+          "slice": 5,
+          "content": "import express from \"express\";\nimport { userRouter } from \"./routes/users.js\";\nimport { postRouter } from \"./routes/posts.js\";\nimport { notFoundHandler, errorHandler } from \"./middleware/error-handler.js\";\n\nconst app = express();\n\napp.use(express.json());\n\napp.get(\"/health\", (_req, res) => {\n  res.json({ status: \"ok\" });\n});\n\napp.use(\"/users\", userRouter);\napp.use(\"/posts\", postRouter);\n\napp.use(notFoundHandler);\napp.use(errorHandler);\n\nexport default app;\n",
+          "description": "Add post router integration to complete REST API"
+        }
+      ]
+    },
+    {
+      "path": "src/types/post.ts",
+      "splitStrategy": "whole",
+      "targetSlice": 4
+    },
+    {
+      "path": "src/services/post-service.ts",
+      "splitStrategy": "whole",
+      "targetSlice": 4
+    },
+    {
+      "path": "tests/post-service.test.ts",
+      "splitStrategy": "whole",
+      "targetSlice": 4
+    },
+    {
+      "path": "src/routes/posts.ts",
+      "splitStrategy": "whole",
+      "targetSlice": 5
+    },
+    {
+      "path": "tests/post-routes.test.ts",
+      "splitStrategy": "whole",
+      "targetSlice": 5
+    }
+  ],
+  "metadata": {
+    "totalFiles": 14,
+    "totalLoc": 422,
+    "generatedAt": "2026-03-01T00:00:00Z",
+    "model": "sonnet",
+    "provider": "claude-cli",
+    "verification": [
+      {
+        "sliceOrder": 1,
+        "check": "tsc",
+        "passed": true,
+        "testsRun": 4,
+        "testsPassed": 4
+      },
+      {
+        "sliceOrder": 2,
+        "check": "tsc",
+        "passed": true,
+        "testsRun": 11,
+        "testsPassed": 11
+      },
+      {
+        "sliceOrder": 3,
+        "check": "tsc",
+        "passed": true,
+        "testsRun": 13,
+        "testsPassed": 13
+      },
+      {
+        "sliceOrder": 4,
+        "check": "tsc",
+        "passed": true,
+        "testsRun": 19,
+        "testsPassed": 19
+      },
+      {
+        "sliceOrder": 5,
+        "check": "tsc",
+        "passed": true,
+        "testsRun": 21,
+        "testsPassed": 21
+      }
+    ]
+  }
+}

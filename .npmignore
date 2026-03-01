@@ -1,0 +1,25 @@
+# Source and config
+src/
+tests/
+tsconfig.json
+tsup.config.ts
+vitest.config.ts
+biome.json
+pnpm-workspace.yaml
+.npmrc
+
+# Documentation and context (README + LICENSE included via package.json files)
+ARCH.md
+CLAUDE.md
+SPEC.md
+TASKS.md
+docs/
+.context/
+.claude/
+.cursor/
+
+# Demo
+demo/
+
+# GitHub
+.github/

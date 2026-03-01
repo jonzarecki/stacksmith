@@ -1,0 +1,13 @@
+---
+description: Repo-wide coding standards
+globs: []
+alwaysApply: true
+---
+
+- Strict typing everywhere — no `any` (TS) or untyped functions (Python)
+- Conventional commits: `feat:`, `fix:`, `refactor:`, `test:`, `docs:`, `chore:`
+- Prefer small, incremental changes
+- Every new module must have corresponding tests
+- Update `.context/progress.md` after completing tasks
+- Reference `SPEC.md` for product requirements
+- Do not create new top-level folders without updating ARCH.md

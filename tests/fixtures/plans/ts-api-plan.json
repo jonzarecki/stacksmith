@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "baseBranch": "main",
+  "sourceBranch": "feat/user-api",
+  "slices": [
+    {
+      "order": 1,
+      "title": "Add User type and schema",
+      "rationale": "Foundation types needed by all subsequent slices",
+      "branch": "stack/01-user-types",
+      "confidence": 0.95
+    },
+    {
+      "order": 2,
+      "title": "Add user service",
+      "rationale": "Core business logic for user operations",
+      "branch": "stack/02-user-service",
+      "confidence": 0.9
+    },
+    {
+      "order": 3,
+      "title": "Add user routes and tests",
+      "rationale": "HTTP layer and test coverage",
+      "branch": "stack/03-user-routes",
+      "confidence": 0.85
+    }
+  ],
+  "fileAssignments": [
+    {
+      "path": "src/types/user.ts",
+      "splitStrategy": "whole",
+      "targetSlice": 1
+    },
+    {
+      "path": "src/services/user-service.ts",
+      "splitStrategy": "whole",
+      "targetSlice": 2
+    },
+    {
+      "path": "src/routes/users.ts",
+      "splitStrategy": "whole",
+      "targetSlice": 3
+    },
+    {
+      "path": "src/app.ts",
+      "splitStrategy": "dissect",
+      "sliceContents": [
+        {
+          "slice": 1,
+          "content": "import express from \"express\";\n\nconst app = express();\n\napp.get(\"/health\", (_req, res) => {\n  res.json({ status: \"ok\" });\n});\n\nexport default app;\n",
+          "description": "Base app with health endpoint only"
+        },
+        {
+          "slice": 3,
+          "content": "import express from \"express\";\nimport { userRouter } from \"./routes/users.js\";\n\nconst app = express();\n\napp.get(\"/health\", (_req, res) => {\n  res.json({ status: \"ok\" });\n});\n\napp.use(\"/users\", userRouter);\n\nexport default app;\n",
+          "description": "Wire user routes into app"
+        }
+      ]
+    },
+    {
+      "path": "tests/user.test.ts",
+      "splitStrategy": "whole",
+      "targetSlice": 3
+    }
+  ],
+  "metadata": {
+    "totalFiles": 5,
+    "totalLoc": 85,
+    "generatedAt": "2026-03-01T00:00:00Z",
+    "model": "claude-sonnet-4-20250514",
+    "provider": "claude-cli"
+  }
+}
