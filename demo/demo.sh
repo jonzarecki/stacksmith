@@ -7,11 +7,13 @@ STACKSMITH="$REPO_ROOT/dist/index.js"
 DEMO_DIR=""
 FAST_MODE=false
 REPLAY_MODE=false
+QUICK_MODE=false
 
 for arg in "$@"; do
   case "$arg" in
     --fast) FAST_MODE=true ;;
     --replay) REPLAY_MODE=true ;;
+    --quick) QUICK_MODE=true; REPLAY_MODE=true ;;
   esac
 done
 
@@ -191,33 +193,44 @@ act_split() {
     echo ""
     type_cmd "stacksmith split"
 
-    printf "  ${GREEN}✔${RESET} Loading config\n"
-    sleep 0.3
-    printf "  ${GREEN}✔${RESET} Resolving LLM adapter\n"
-    sleep 0.3
-    printf "  ${GREEN}✔${RESET} Getting diff vs base branch\n"
-    sleep 0.2
-    printf "  Found 14 changed files\n"
-    sleep 0.5
-
-    # Simulate AI thinking time
-    for i in 1 2 3 4 5 6 7 8; do
-      local elapsed=$((i * 2))
-      printf "\r  ⠙ Generating plan (${elapsed}s)..."
+    if [[ "$QUICK_MODE" == true ]]; then
+      printf "  ${GREEN}✔${RESET} Loading config\n"
+      printf "  ${GREEN}✔${RESET} Resolving LLM adapter\n"
+      printf "  ${GREEN}✔${RESET} Getting diff (14 files)\n"
+      printf "  ⠙ Generating plan..."
+      sleep 1.5
+      printf "\r  ${GREEN}✔${RESET} Generating plan (16.2s)\n"
+      printf "  ⠙ Verifying boundaries..."
       sleep 1
-    done
-    printf "\r  ${GREEN}✔${RESET} Generating plan (16.2s)    \n"
-    sleep 0.5
+      printf "\r  ${GREEN}✔${RESET} Verified: 5/5 slices passed (tsc + tests)\n"
+      sleep 0.3
+    else
+      printf "  ${GREEN}✔${RESET} Loading config\n"
+      sleep 0.3
+      printf "  ${GREEN}✔${RESET} Resolving LLM adapter\n"
+      sleep 0.3
+      printf "  ${GREEN}✔${RESET} Getting diff vs base branch\n"
+      sleep 0.2
+      printf "  Found 14 changed files\n"
+      sleep 0.5
 
-    # Simulate boundary verification
-    printf "  ⠙ Verifying boundaries — checking slice 1/5..."
-    sleep 1
-    printf "\r  ⠙ Verifying boundaries — checking slice 3/5..."
-    sleep 1
-    printf "\r  ⠙ Verifying boundaries — checking slice 5/5..."
-    sleep 1
-    printf "\r  ${GREEN}✔${RESET} Verifying boundaries — 5/5 slices passed (tsc + tests)\n"
-    sleep 0.3
+      for i in 1 2 3 4 5 6 7 8; do
+        local elapsed=$((i * 2))
+        printf "\r  ⠙ Generating plan (${elapsed}s)..."
+        sleep 1
+      done
+      printf "\r  ${GREEN}✔${RESET} Generating plan (16.2s)    \n"
+      sleep 0.5
+
+      printf "  ⠙ Verifying boundaries — checking slice 1/5..."
+      sleep 1
+      printf "\r  ⠙ Verifying boundaries — checking slice 3/5..."
+      sleep 1
+      printf "\r  ⠙ Verifying boundaries — checking slice 5/5..."
+      sleep 1
+      printf "\r  ${GREEN}✔${RESET} Verifying boundaries — 5/5 slices passed (tsc + tests)\n"
+      sleep 0.3
+    fi
 
     cp "$GOLDEN_PLAN" stack.plan.json
     printf "\n  ${GREEN}✔${RESET} Plan written to stack.plan.json\n"
@@ -262,12 +275,12 @@ act_apply() {
 
   press_enter
 
-  commentary "And the commit graph:"
-  echo ""
-
-  pe "git log --oneline --graph --all --decorate"
-
-  press_enter
+  if [[ "$QUICK_MODE" != true ]]; then
+    commentary "And the commit graph:"
+    echo ""
+    pe "git log --oneline --graph --all --decorate"
+    press_enter
+  fi
 }
 
 act_push() {
@@ -310,7 +323,9 @@ main() {
   act_problem
   act_split
   act_apply
-  act_push
+  if [[ "$QUICK_MODE" != true ]]; then
+    act_push
+  fi
   act_closing
 }
 
