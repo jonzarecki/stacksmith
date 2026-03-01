@@ -1,6 +1,6 @@
+import { colorize } from "consola/utils";
 import type { SimpleGit } from "simple-git";
 import { simpleGit } from "simple-git";
-import { colorize } from "consola/utils";
 import { readPlan } from "../core/plan.js";
 import { applyPlan } from "../git/plan-applier.js";
 import type { StackPlan } from "../types/index.js";
@@ -28,7 +28,9 @@ export async function applyCommand(): Promise<void> {
 
   console.log(formatStackTree(plan));
   console.log(formatBranchStats(plan, diffStats));
-  console.log(formatBeforeAfter(plan.metadata.totalFiles, plan.metadata.totalLoc, plan.slices.length));
+  console.log(
+    formatBeforeAfter(plan.metadata.totalFiles, plan.metadata.totalLoc, plan.slices.length),
+  );
 
   await verifyStackEquivalence(git, plan);
 }
@@ -41,7 +43,7 @@ async function getDiffStatsBySlice(git: SimpleGit, plan: StackPlan): Promise<Bra
     const slice = sortedSlices[i];
     if (!slice) continue;
 
-    const prevBranch = i === 0 ? plan.baseBranch : sortedSlices[i - 1]?.branch ?? plan.baseBranch;
+    const prevBranch = i === 0 ? plan.baseBranch : (sortedSlices[i - 1]?.branch ?? plan.baseBranch);
     try {
       const diffOutput = await git.diff(["--shortstat", `${prevBranch}..${slice.branch}`]);
       stats.push({ sliceOrder: slice.order, ...parseShortStat(diffOutput) });
@@ -61,13 +63,19 @@ async function verifyStackEquivalence(git: SimpleGit, plan: StackPlan): Promise<
   const diff = await git.diff([`${lastBranch}..${plan.sourceBranch}`]);
 
   if (diff.trim().length === 0) {
-    console.log(`\n  ${colorize("green", "✓ Stack verified:")} final branch ${lastBranch} is identical to ${plan.sourceBranch}`);
+    console.log(
+      `\n  ${colorize("green", "✓ Stack verified:")} final branch ${lastBranch} is identical to ${plan.sourceBranch}`,
+    );
   } else {
     const lines = diff.split("\n").length;
     logger.warn(
       `Stack divergence: ${lastBranch} differs from ${plan.sourceBranch} by ${lines} lines`,
     );
-    console.log(`\n  ${colorize("yellow", "⚠ Stack divergence:")} ${lastBranch} differs from ${plan.sourceBranch}`);
-    console.log(`    ${lines} diff lines — some changes may have been lost or modified during splitting`);
+    console.log(
+      `\n  ${colorize("yellow", "⚠ Stack divergence:")} ${lastBranch} differs from ${plan.sourceBranch}`,
+    );
+    console.log(
+      `    ${lines} diff lines — some changes may have been lost or modified during splitting`,
+    );
   }
 }

@@ -98,9 +98,7 @@ describe("E2E: split → apply pipeline", () => {
 
     await applyPlan(repo.git, modifiedPlan, repo.dir);
 
-    const lastBranch = modifiedPlan.slices
-      .sort((a, b) => a.order - b.order)
-      .at(-1)?.branch;
+    const lastBranch = modifiedPlan.slices.sort((a, b) => a.order - b.order).at(-1)?.branch;
     expect(lastBranch).toBeDefined();
 
     const diff = await repo.git.diff([`${lastBranch}..${plan.sourceBranch}`]);

@@ -75,7 +75,8 @@ export function formatPlanSummary(plan: StackPlan): string {
     );
 
     const loc = computeSliceLoc(plan, slice.order);
-    const locDisplay = loc > 0 ? `~${loc}` : `~${Math.round(plan.metadata.totalLoc / sortedSlices.length)}`;
+    const locDisplay =
+      loc > 0 ? `~${loc}` : `~${Math.round(plan.metadata.totalLoc / sortedSlices.length)}`;
 
     const row: Array<string | number> = [slice.order, slice.title, sliceFiles.length, locDisplay];
 
@@ -117,8 +118,11 @@ export function formatPlanSummary(plan: StackPlan): string {
     if (hasTests) {
       const totalTests = verification.reduce((sum, v) => sum + (v.testsRun ?? 0), 0);
       const totalPassed = verification.reduce((sum, v) => sum + (v.testsPassed ?? 0), 0);
-      const testIcon = totalPassed === totalTests ? colorize("green", "✓") : colorize("yellow", "⚠");
-      parts.push(`${testIcon} Tests: ${totalPassed}/${totalTests} passed across ${lintTotal} slices`);
+      const testIcon =
+        totalPassed === totalTests ? colorize("green", "✓") : colorize("yellow", "⚠");
+      parts.push(
+        `${testIcon} Tests: ${totalPassed}/${totalTests} passed across ${lintTotal} slices`,
+      );
     }
 
     summary += `\n\n  ${parts.join("\n  ")}`;
@@ -133,15 +137,16 @@ export function formatStackTree(plan: StackPlan): string {
   function buildTreeItems(
     slices: typeof sortedSlices,
     index: number,
-  ): Array<{ text: string; children?: Array<{ text: string; children?: ReturnType<typeof buildTreeItems> }> }> {
+  ): Array<{
+    text: string;
+    children?: Array<{ text: string; children?: ReturnType<typeof buildTreeItems> }>;
+  }> {
     if (index >= slices.length) return [];
     const slice = slices[index];
     if (!slice) return [];
 
     const isFirst = index === 0;
-    const status = isFirst
-      ? colorize("green", "Ready for Review")
-      : colorize("yellow", "Draft");
+    const status = isFirst ? colorize("green", "Ready for Review") : colorize("yellow", "Draft");
     const label = `${colors.bold(slice.branch)}  ${colors.gray(`PR #${slice.order}`)} · ${status}`;
 
     return [
@@ -225,7 +230,7 @@ export function formatPrCards(plan: StackPlan, prs: PrResult[]): string {
     if (!pr) continue;
 
     const isFirst = i === 0;
-    const baseBranch = isFirst ? plan.baseBranch : sortedSlices[i - 1]?.branch ?? plan.baseBranch;
+    const baseBranch = isFirst ? plan.baseBranch : (sortedSlices[i - 1]?.branch ?? plan.baseBranch);
     const statusBadge = pr.draft
       ? colorize("yellow", "Draft")
       : colorize("green", "Ready for Review");
@@ -262,7 +267,11 @@ export function formatPrCards(plan: StackPlan, prs: PrResult[]): string {
   return cards.join("\n");
 }
 
-export function parseShortStat(output: string): { filesChanged: number; insertions: number; deletions: number } {
+export function parseShortStat(output: string): {
+  filesChanged: number;
+  insertions: number;
+  deletions: number;
+} {
   const filesMatch = output.match(/(\d+) files? changed/);
   const insertionsMatch = output.match(/(\d+) insertions?\(\+\)/);
   const deletionsMatch = output.match(/(\d+) deletions?\(-\)/);

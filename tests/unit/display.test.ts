@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { StackPlan } from "../../src/types/index.js";
 import type { PrResult } from "../../src/github/pr-manager.js";
+import type { StackPlan } from "../../src/types/index.js";
 import {
   type BranchDiffStat,
   formatBeforeAfter,
@@ -17,9 +17,27 @@ function makePlan(): StackPlan {
     baseBranch: "main",
     sourceBranch: "feat/user-api",
     slices: [
-      { order: 1, title: "Add types", rationale: "Foundation", branch: "stack/01-types", confidence: 0.95 },
-      { order: 2, title: "Add service", rationale: "Core logic", branch: "stack/02-service", confidence: 0.9 },
-      { order: 3, title: "Add routes", rationale: "HTTP layer", branch: "stack/03-routes", confidence: 0.85 },
+      {
+        order: 1,
+        title: "Add types",
+        rationale: "Foundation",
+        branch: "stack/01-types",
+        confidence: 0.95,
+      },
+      {
+        order: 2,
+        title: "Add service",
+        rationale: "Core logic",
+        branch: "stack/02-service",
+        confidence: 0.9,
+      },
+      {
+        order: 3,
+        title: "Add routes",
+        rationale: "HTTP layer",
+        branch: "stack/03-routes",
+        confidence: 0.85,
+      },
     ],
     fileAssignments: [
       { path: "src/types/user.ts", splitStrategy: "whole", targetSlice: 1 },
@@ -67,8 +85,18 @@ function makePlanWithDissect(): StackPlan {
         path: "src/app.ts",
         splitStrategy: "dissect",
         sliceContents: [
-          { slice: 1, content: "import express from 'express';\nconst app = express();\nexport default app;\n", description: "Base app" },
-          { slice: 2, content: "import express from 'express';\nimport { userRouter } from './routes/users.js';\nconst app = express();\napp.use('/users', userRouter);\nexport default app;\n", description: "Wire routes" },
+          {
+            slice: 1,
+            content:
+              "import express from 'express';\nconst app = express();\nexport default app;\n",
+            description: "Base app",
+          },
+          {
+            slice: 2,
+            content:
+              "import express from 'express';\nimport { userRouter } from './routes/users.js';\nconst app = express();\napp.use('/users', userRouter);\nexport default app;\n",
+            description: "Wire routes",
+          },
         ],
       },
     ],

@@ -2,8 +2,8 @@ import { execFile } from "node:child_process";
 import { access } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { promisify } from "node:util";
-import { afterEach, describe, expect, it } from "vitest";
 import { simpleGit } from "simple-git";
+import { afterEach, describe, expect, it } from "vitest";
 
 const execFileAsync = promisify(execFile);
 const SETUP_SCRIPT = resolve(import.meta.dirname, "../../demo/setup-fixture.sh");

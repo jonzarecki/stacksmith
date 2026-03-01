@@ -138,8 +138,12 @@ async function validateAndRepairPlan(
 
   // Phase 1: AI-driven revision (same conversation context)
   for (let round = 1; round <= MAX_AI_REVISION_ROUNDS; round++) {
-    const progress = new ProgressSpinner(`Verifying boundaries (round ${round}/${MAX_AI_REVISION_ROUNDS})`);
-    const results = await applyAndCheckBoundaries(plan, repoDir, language, checkOptions, (step) => progress.update(step));
+    const progress = new ProgressSpinner(
+      `Verifying boundaries (round ${round}/${MAX_AI_REVISION_ROUNDS})`,
+    );
+    const results = await applyAndCheckBoundaries(plan, repoDir, language, checkOptions, (step) =>
+      progress.update(step),
+    );
     if (results.failures.length === 0) {
       progress.succeed();
       logger.success("All boundaries passed verification");
@@ -151,11 +155,13 @@ async function validateAndRepairPlan(
     if (!firstFailure) break;
 
     try {
-      plan = await withSpinner("AI revising plan", () => adapter.revisePlan(plan, {
-        sliceOrder: firstFailure.sliceOrder,
-        errorOutput: firstFailure.errorOutput,
-        failedCheck: firstFailure.check,
-      }));
+      plan = await withSpinner("AI revising plan", () =>
+        adapter.revisePlan(plan, {
+          sliceOrder: firstFailure.sliceOrder,
+          errorOutput: firstFailure.errorOutput,
+          failedCheck: firstFailure.check,
+        }),
+      );
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       logger.warn(`AI revision failed: ${msg} — falling back to mechanical collapse`);
@@ -165,8 +171,12 @@ async function validateAndRepairPlan(
 
   // Phase 2: Mechanical collapse as fallback
   for (let round = 1; round <= MAX_COLLAPSE_ROUNDS; round++) {
-    const progress = new ProgressSpinner(`Verifying after collapse (round ${round}/${MAX_COLLAPSE_ROUNDS})`);
-    const results = await applyAndCheckBoundaries(plan, repoDir, language, checkOptions, (step) => progress.update(step));
+    const progress = new ProgressSpinner(
+      `Verifying after collapse (round ${round}/${MAX_COLLAPSE_ROUNDS})`,
+    );
+    const results = await applyAndCheckBoundaries(plan, repoDir, language, checkOptions, (step) =>
+      progress.update(step),
+    );
     if (results.failures.length === 0) {
       progress.succeed();
       logger.success("All boundaries passed verification after collapse");

@@ -2,9 +2,9 @@ import { execFile } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { promisify } from "node:util";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { simpleGit } from "simple-git";
 import type { SimpleGit } from "simple-git";
+import { simpleGit } from "simple-git";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { validatePlan, writePlan } from "../../src/core/plan.js";
 import { applyPlan } from "../../src/git/plan-applier.js";
 import type { StackPlan } from "../../src/types/index.js";
@@ -87,31 +87,37 @@ describe("demo E2E with cached AI response", () => {
     expect(app5).toContain("postRouter");
   });
 
-  it("tests are colocated with their code (not in separate slice)", { timeout: 30_000 }, async () => {
-    await git.checkout("feat/full-rest-api");
-    await writePlan(plan, demoDir);
-    await applyPlan(git, plan, demoDir);
+  it(
+    "tests are colocated with their code (not in separate slice)",
+    { timeout: 30_000 },
+    async () => {
+      await git.checkout("feat/full-rest-api");
+      await writePlan(plan, demoDir);
+      await applyPlan(git, plan, demoDir);
 
-    const testAssignments = plan.fileAssignments.filter(
-      (fa) => fa.path.includes("test") || fa.path.includes("spec"),
-    );
-
-    for (const testFile of testAssignments) {
-      const targetSlice = testFile.targetSlice
-        ?? testFile.sliceContents?.[0]?.slice;
-      expect(targetSlice, `${testFile.path} should have a slice assignment`).toBeDefined();
-
-      // The test file's slice should also contain non-test code
-      const sliceFiles = plan.fileAssignments.filter((fa) => {
-        if (fa.targetSlice === targetSlice) return true;
-        return fa.sliceContents?.some((sc) => sc.slice === targetSlice) ?? false;
-      });
-      const hasSourceCode = sliceFiles.some(
-        (fa) => !fa.path.includes("test") && !fa.path.includes("spec"),
+      const testAssignments = plan.fileAssignments.filter(
+        (fa) => fa.path.includes("test") || fa.path.includes("spec"),
       );
-      expect(hasSourceCode, `slice ${targetSlice} (with ${testFile.path}) should also have source code`).toBe(true);
-    }
-  });
+
+      for (const testFile of testAssignments) {
+        const targetSlice = testFile.targetSlice ?? testFile.sliceContents?.[0]?.slice;
+        expect(targetSlice, `${testFile.path} should have a slice assignment`).toBeDefined();
+
+        // The test file's slice should also contain non-test code
+        const sliceFiles = plan.fileAssignments.filter((fa) => {
+          if (fa.targetSlice === targetSlice) return true;
+          return fa.sliceContents?.some((sc) => sc.slice === targetSlice) ?? false;
+        });
+        const hasSourceCode = sliceFiles.some(
+          (fa) => !fa.path.includes("test") && !fa.path.includes("spec"),
+        );
+        expect(
+          hasSourceCode,
+          `slice ${targetSlice} (with ${testFile.path}) should also have source code`,
+        ).toBe(true);
+      }
+    },
+  );
 
   it("verification data shows progressive test counts", () => {
     const verification = plan.metadata.verification;
@@ -139,9 +145,7 @@ describe("demo E2E with cached AI response", () => {
     await writePlan(plan, demoDir);
     await applyPlan(git, plan, demoDir);
 
-    const lastBranch = plan.slices
-      .sort((a, b) => a.order - b.order)
-      .at(-1)?.branch;
+    const lastBranch = plan.slices.sort((a, b) => a.order - b.order).at(-1)?.branch;
     expect(lastBranch).toBeDefined();
 
     const diff = await git.diff([`${lastBranch}..feat/full-rest-api`]);
